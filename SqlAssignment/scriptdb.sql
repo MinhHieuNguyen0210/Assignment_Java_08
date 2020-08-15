@@ -165,5 +165,90 @@ insert into cthd values(1022,'ST07',1);
 insert into cthd values(1023,'ST04',6);
 
 -- I
+-- 1.In ra danh sách các sản phẩm (MASP,TENSP) do “Trung Quoc” sản xuất.
+select sp.MaSP, sp.TenSP
+from sanpham sp
+where NuocSX ="Trung Quoc"
+-- 2. In ra danh sách các sản phẩm (MASP, TENSP) có đơn vị tính là “cay”, ”quyen”.
+select sp.MaSP, sp.TenSP
+from sanpham sp
+where sp.DVT = "cay" or sp.DVT ="quyen"
+-- 3. In ra danh sách các sản phẩm (MASP,TENSP) có mã sản phẩm bắt đầu là “B” và kết
+-- thúc là “01”.
+select sp.MaSP, sp.TenSP
+from sanpham sp
+where sp.MaSP like "B%01"
+-- 4. In ra danh sách các sản phẩm (MASP,TENSP) do “Trung Quốc” sản xuất có giá từ
+-- 30.000 đến 40.000.
+select sp.MaSP, sp.TenSP
+from sanpham sp
+where sp.NuocSX ="Trung Quoc" and sp.Gia between 30000 and 40000
+-- 5. In ra danh sách các sản phẩm (MASP,TENSP) do “Trung Quoc” hoặc “Thai Lan” sản
+-- xuất có giá từ 30.000 đến 40.000.
+select sp.MaSP, sp.TenSP
+from sanpham sp
+where sp.NuocSX ="Trung Quoc" or sp.NuocSX ="Thai Lan"
+and sp.Gia between 30000 and 40000
+-- 6. In ra các số hóa đơn, trị giá hóa đơn bán ra trong ngày 1/1/2007 và ngày 2/1/2007.
+select hd.SoHD, hd.TriGia
+from HoaDon hd
+where hd.NgHD ="2007-01-01" or hd.NgHD = "2007-01-02"
+-- 7. In ra các số hóa đơn, trị giá hóa đơn trong tháng 1/2007, sắp xếp theo ngày (tăng
+-- dần) và trị giá của hóa đơn (giảm dần).
+select hd.SoHD, hd.TriGia
+from HoaDon hd
+where month(hd.NgHD) = 1 and year(hd.NgHD) = 2007
+order by hd.TriGia desc
+
 -- II
+-- 1. In ra danh sách các khách hàng (MAKH, HOTEN) đã mua hàng trong ngày 1/1/2007.
+select 	kh.MaKH, kh.HoTen
+from KhachHang kh join HoaDon hd on kh.MaKH = hd.MaKH 
+where hd.NgHD ="2007-01-01"
+-- 2. In ra số hóa đơn, trị giá các hóa đơn do nhân viên có tên “Nguyen Van B” lập trong
+-- ngày 28/10/2006.
+select hd.SoHD, hd.TriGia
+from NhanVien nv join HoaDon hd on nv.MaNV = hd.MaNV 
+where nv.HoTen ="Nguyen Van B" and hd.NgHD = "2006-10-28"
+-- 3. Tìm các số hóa đơn đã mua sản phẩm có mã số “BB01” hoặc “BB02”.
+select hd.SoHD
+from HoaDon hd join CTHD ct on hd.SoHD = ct.SoHD 
+where ct.MaSP ="BB01" or ct.MaSP ="BB02"
+
+-- 4. Tìm các số hóa đơn đã mua sản phẩm có mã số “BB01” hoặc “BB02”, mỗi sản phẩm
+-- mua với số lượng từ 10 đến 20.
+select hd.SoHD
+from HoaDon hd join CTHD ct on hd.SoHD = ct.SoHD 
+where ct.MaSP ="BB01" or ct.MaSP ="BB02"
+and ct.SoLuong between 10 and 20
+-- 5. Cho biết trị giá hóa đơn cao nhất, thấp nhất là bao nhiêu ?
+select max(hd.TriGia) as TriGiaHDCaoNhat, min(hd.TriGia) as TriGiaHDThapNhat
+from HoaDon hd
+-- 6. Trị giá trung bình của tất cả các hóa đơn được bán ra trong năm 2006 là bao nhiêu?
+select avg(hd.TriGia) as TriGiaTrungBinh
+from HoaDon hd
+where year(hd.NgHD) = 2006;
+-- 7. Tính doanh thu bán hàng trong năm 2006.
+select sum(hd.TriGia) DoanhThu
+from HoaDon hd
+where year(hd.NgHD) = 2006;
+-- 8. In ra danh sách 3 khách hàng (MAKH, HOTEN) có doanh số cao nhất.
+select kh.MaKH, kh.HoTen
+from KhachHang kh
+order by kh.DoanhSo DESC 
+limit 3 
 -- III 
+-- 1. Tính tổng số sản phẩm do “Trung Quoc” sản xuất.
+select count(MaSP) TongSoSanPham
+from SanPham 
+where NuocSX ="Trung Quoc"
+-- 2. Tính tổng số sản phẩm của từng nước sản xuất.
+select NuocSX, count(MaSP) as TongSP
+from SanPham
+group by NuocSX
+-- 3. Với từng nước sản xuất, tìm giá bán cao nhất, thấp nhất, trung bình của các sản
+-- phẩm.
+select NuocSX, max(Gia) as GiaCaoNhat, min(Gia)GiaThapNhat, avg(Gia)GiaTrungBinh
+from SanPham
+group by NuocSX
+-- 4. Tính doanh thu bán hàng mỗi ngày.
